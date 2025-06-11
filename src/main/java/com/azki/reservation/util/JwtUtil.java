@@ -3,7 +3,6 @@ package com.azki.reservation.util;
 import com.azki.reservation.config.security.JwtProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -11,11 +10,15 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Component
-@AllArgsConstructor
 public class JwtUtil {
 
     private final JwtProperties jwtProperties;
-    private final SecretKey secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+    private final SecretKey secretKey;
+
+    public JwtUtil(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+    }
 
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
