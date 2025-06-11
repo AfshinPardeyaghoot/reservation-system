@@ -4,9 +4,11 @@ import com.azki.reservation.config.redis.RedisConfig;
 import com.azki.reservation.model.Slot;
 import com.azki.reservation.repository.SlotRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,21 +27,41 @@ public class CacheService {
 
     @Transactional(readOnly = true)
     public void populateCache() {
-        List<Slot> available = slotRepository.findAvailable(
-                Pageable.unpaged(), LocalDateTime.now()).getContent();
+        int pageSize = 100_000;
+        int page = 0;
+        boolean hasMore = true;
 
-        System.out.println("Load available slots to cache:" + available.size());
+        while (hasMore) {
+            Page<Slot> pageResult = slotRepository.findAvailable(PageRequest.of(page, pageSize), LocalDateTime.now());
+            List<Slot> available = pageResult.getContent();
+            System.out.println("Load available slots to cache (page " + page + "): " + available.size());
 
-        redisTemplate.delete(KEY);
+            if (available.isEmpty()) {
+                hasMore = false;
+                break;
+            }
 
-        redisTemplate.executePipelined((RedisCallback<Object>) cnn -> {
-            available.forEach(s ->
-                    cnn.zAdd(KEY.getBytes(StandardCharsets.UTF_8),
-                            s.getStartTime().toEpochSecond(ZoneOffset.UTC),
-                            s.getId().toString().getBytes(StandardCharsets.UTF_8)));
+            redisTemplate.executePipelined((RedisCallback<Object>) cnn -> {
+                available.forEach(s ->
+                        cnn.zAdd(KEY.getBytes(StandardCharsets.UTF_8),
+                                s.getStartTime().toEpochSecond(ZoneOffset.UTC),
+                                s.getId().toString().getBytes(StandardCharsets.UTF_8)));
+                return null;
+            });
 
-            return null;
-        });
+            page++;
+        }
+        System.out.println("Cache population completed.");
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    @Transactional(readOnly = false)
+    public void cleanupExpiredSlots() {
+        long expiryThreshold = LocalDateTime.now().minusDays(1).toEpochSecond(ZoneOffset.UTC);
+
+        Long removedCount = redisTemplate.opsForZSet().removeRangeByScore(KEY, 0, expiryThreshold);
+
+        System.out.println("Cleaned up " + (removedCount != null ? removedCount : 0) + " expired slots from cache.");
     }
 
 }
