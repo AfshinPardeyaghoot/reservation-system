@@ -34,11 +34,11 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequestDto signupRequest) {
-        User user = authenticationService.signup(signupRequest);
+        authenticationService.signup(signupRequest);
 
         String token = authenticationService.authenticateUser(
                 signupRequest.username(),
-                user.getPassword()
+                signupRequest.password()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new HttpResponse<>(new LoginResponseDto(token)));

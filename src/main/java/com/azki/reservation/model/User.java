@@ -16,9 +16,12 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_created_at", columnList = "created_at")
-})
+@Table(
+        name = "users",
+        indexes = {
+                @Index(name = "idx_created_at", columnList = "created_at")
+        }
+)
 public class User {
 
     @Id
