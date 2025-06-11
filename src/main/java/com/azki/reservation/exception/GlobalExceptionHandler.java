@@ -1,8 +1,8 @@
 package com.azki.reservation.exception;
 
 
-import com.azki.reservation.dto.HttpResponse;
-import com.azki.reservation.dto.HttpResponseStatus;
+import com.azki.reservation.dto.http.HttpResponse;
+import com.azki.reservation.dto.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

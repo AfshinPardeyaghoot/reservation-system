@@ -1,4 +1,4 @@
-package com.azki.reservation.dto;
+package com.azki.reservation.dto.http;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,10 +1,9 @@
 package com.azki.reservation.controller;
 
-import com.azki.reservation.dto.HttpResponse;
-import com.azki.reservation.dto.LoginRequestDto;
-import com.azki.reservation.dto.LoginResponseDto;
-import com.azki.reservation.dto.SignupRequestDto;
-import com.azki.reservation.model.User;
+import com.azki.reservation.dto.http.HttpResponse;
+import com.azki.reservation.dto.auth.LoginRequestDto;
+import com.azki.reservation.dto.auth.LoginResponseDto;
+import com.azki.reservation.dto.auth.SignupRequestDto;
 import com.azki.reservation.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,6 @@
 package com.azki.reservation.controller;
 
-import com.azki.reservation.dto.HttpResponse;
+import com.azki.reservation.dto.http.HttpResponse;
 import com.azki.reservation.dto.SlotDto;
 import com.azki.reservation.service.SlotService;
 import lombok.AllArgsConstructor;

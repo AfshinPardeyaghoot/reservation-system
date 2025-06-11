@@ -1,6 +1,6 @@
 package com.azki.reservation.service;
 
-import com.azki.reservation.dto.SignupRequestDto;
+import com.azki.reservation.dto.auth.SignupRequestDto;
 import com.azki.reservation.exception.DuplicateUserException;
 import com.azki.reservation.model.User;
 import com.azki.reservation.repository.UserRepository;
