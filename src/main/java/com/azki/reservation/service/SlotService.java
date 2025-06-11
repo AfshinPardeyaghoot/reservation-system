@@ -2,6 +2,8 @@ package com.azki.reservation.service;
 
 import com.azki.reservation.config.redis.RedisConfig;
 import com.azki.reservation.dto.SlotDto;
+import com.azki.reservation.exception.NotFoundException;
+import com.azki.reservation.model.Slot;
 import com.azki.reservation.repository.SlotRepository;
 import jakarta.annotation.PostConstruct;
 
@@ -34,16 +36,13 @@ public class SlotService {
 
     @Transactional(readOnly = true)
     public Page<SlotDto> getAvailable(Pageable pageable) {
-
         long start = pageable.getOffset();
         long end = start + pageable.getPageSize() - 1;
 
         Set<Object> idObjs = redisTemplate.opsForZSet().range(KEY, start, end);
-        System.out.println("Exist in cache: " + idObjs);
         if (idObjs == null || idObjs.isEmpty()) {
             cacheService.populateCache();
             idObjs = redisTemplate.opsForZSet().range(KEY, start, end);
-            System.out.println("Added to cache: " + idObjs);
         }
 
         List<Long> ids = idObjs.stream().map(o -> Long.valueOf(o.toString())).toList();
@@ -54,6 +53,15 @@ public class SlotService {
 
         Long total = redisTemplate.opsForZSet().zCard(KEY);
         return new PageImpl<>(slots, pageable, total == null ? 0 : total);
+    }
+
+    public int markSlotAsReserved(long id) {
+        return slotRepository.markAsReserved(id);
+    }
+
+    public Slot findById(long id) {
+        return slotRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Slot not found"));
     }
 
 }
