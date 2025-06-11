@@ -1,4 +1,6 @@
 package com.azki.reservation.dto;
 
-public record SlotDto() {
+import java.time.LocalDateTime;
+
+public record SlotDto(long id, LocalDateTime startTime, LocalDateTime endTime) {
 }
