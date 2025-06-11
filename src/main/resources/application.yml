@@ -30,4 +30,4 @@ server:
 auth:
   jwt:
     access-token-validity-seconds: 600
-    secret: jwtsecretkyisthis
+    secret: lp+flT+lHbG5iLFZzx7b5RA8oVa2CMewtiCsKs3y1Kw=
