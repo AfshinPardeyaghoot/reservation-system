@@ -4,7 +4,6 @@ import com.azki.reservation.config.redis.RedisConfig;
 import com.azki.reservation.model.Slot;
 import com.azki.reservation.repository.SlotRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,7 +17,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class CachService {
+public class CacheService {
 
     public static final String KEY = RedisConfig.AVAILABLE_SLOTS_ZSET;
     private final SlotRepository slotRepository;
@@ -28,6 +27,8 @@ public class CachService {
     public void populateCache() {
         List<Slot> available = slotRepository.findAvailable(
                 Pageable.unpaged(), LocalDateTime.now()).getContent();
+
+        System.out.println("Load available slots to cache:" + available.size());
 
         redisTemplate.delete(KEY);
 
