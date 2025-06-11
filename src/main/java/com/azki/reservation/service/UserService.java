@@ -14,6 +14,6 @@ public class UserService {
 
     public User findByUsername(String username) {
         return userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(() -> new NotFoundException("User not found: " + username));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }
