@@ -7,6 +7,7 @@ import com.azki.reservation.dto.auth.SignupRequestDto;
 import com.azki.reservation.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -38,8 +39,19 @@ public class AuthenticationController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Login successful, JWT token returned",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+                    content = @Content(
+                            schema = @Schema(implementation = HttpResponse.class),
+                            examples = @ExampleObject(value = "{\"success\": true, \"message\": \"Login successful\", \"code\": 200, \"data\": {\"token\": \"jwt-token-here\"}}")
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials",
+                    content = @Content(
+                            schema = @Schema(implementation = HttpResponse.class),
+                            examples = @ExampleObject(value = "{\"success\": false, \"message\": \"Invalid credentials\", \"code\": 401, \"data\": null}")
+                    )
+            )
     })
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequest) {
         String token = authenticationService.authenticateUser(
@@ -59,8 +71,27 @@ public class AuthenticationController {
             @ApiResponse(
                     responseCode = "201",
                     description = "User created successfully, JWT token returned",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid data or username already exists")
+                    content = @Content(
+                            schema = @Schema(implementation = HttpResponse.class),
+                            examples = @ExampleObject(value = "{\"success\": true, \"message\": \"User created successfully\", \"code\": 201, \"data\": {\"token\": \"jwt-token-here\"}}")
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid data",
+                    content = @Content(
+                            schema = @Schema(implementation = HttpResponse.class),
+                            examples = @ExampleObject(value = "{\"success\": false, \"message\": \"Invalid data\", \"code\": 400, \"data\": null}")
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Username already exists",
+                    content = @Content(
+                            schema = @Schema(implementation = HttpResponse.class),
+                            examples = @ExampleObject(value = "{\"success\": false, \"message\": \"Username already exists\", \"code\": 409, \"data\": null}")
+                    )
+            )
     })
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto signupRequest) {
         authenticationService.signup(signupRequest);
