@@ -4,6 +4,7 @@ import com.azki.reservation.config.redis.RedisConfig;
 import com.azki.reservation.model.Slot;
 import com.azki.reservation.repository.SlotRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CacheService {
@@ -38,7 +40,7 @@ public class CacheService {
         while (true) {
             Page<Slot> pageResult = slotRepository.findAvailable(PageRequest.of(page, pageSize), LocalDateTime.now());
             List<Slot> available = pageResult.getContent();
-            System.out.println("Load available slots to cache (page " + page + "): " + available.size());
+            log.info("Load available slots to cache (page {}):{}", page, available.size());
 
             if (available.isEmpty()) {
                 hasMore = false;
@@ -64,7 +66,7 @@ public class CacheService {
             page++;
         }
 
-        System.out.println("Cache population completed.");
+        log.info("Cache population completed.");
     }
 
 
@@ -75,7 +77,7 @@ public class CacheService {
 
         Long removedCount = redisTemplate.opsForZSet().removeRangeByScore(KEY, 0, expiryThreshold);
 
-        System.out.println("Cleaned up " + (removedCount != null ? removedCount : 0) + " expired slots from cache.");
+        log.info("Cleaned up {} expired slots from cache.", removedCount != null ? removedCount : 0);
     }
 
 }
