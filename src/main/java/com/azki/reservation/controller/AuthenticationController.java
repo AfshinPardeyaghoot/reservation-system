@@ -5,6 +5,7 @@ import com.azki.reservation.dto.auth.LoginRequestDto;
 import com.azki.reservation.dto.auth.LoginResponseDto;
 import com.azki.reservation.dto.auth.SignupRequestDto;
 import com.azki.reservation.service.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequest) {
         String token = authenticationService.authenticateUser(
                 loginRequest.username(),
                 loginRequest.password()
@@ -32,7 +33,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequestDto signupRequest) {
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto signupRequest) {
         authenticationService.signup(signupRequest);
 
         String token = authenticationService.authenticateUser(

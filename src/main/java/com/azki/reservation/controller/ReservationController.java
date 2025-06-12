@@ -4,6 +4,7 @@ import com.azki.reservation.dto.ReservationRequestDto;
 import com.azki.reservation.model.Reservation;
 import com.azki.reservation.service.ReservationService;
 import com.azki.reservation.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @PostMapping
-    public Reservation reserve(@RequestBody ReservationRequestDto dto,
+    public Reservation reserve(@Valid @RequestBody ReservationRequestDto dto,
                                Principal principal) {
 
         var user = userService.findByUsername(principal.getName());
