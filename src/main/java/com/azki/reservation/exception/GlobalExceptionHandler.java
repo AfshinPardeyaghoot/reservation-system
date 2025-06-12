@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,6 +26,30 @@ import javax.naming.AuthenticationException;
 public class GlobalExceptionHandler
         extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public final ResponseEntity<HttpResponse<?>> handleInternalAuthenticationException(InternalAuthenticationServiceException ex) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof NotFoundException) {
+            HttpResponseStatus status = new HttpResponseStatus(
+                    cause.getMessage(),
+                    HttpStatus.NOT_FOUND.value()
+            );
+            return new ResponseEntity<>(
+                    new HttpResponse<>(status),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        log.error("Internal authentication error: {}", ex.getMessage(), ex);
+        HttpResponseStatus status = new HttpResponseStatus(
+                "Authentication failed",
+                HttpStatus.INTERNAL_SERVER_ERROR.value()
+        );
+        return new ResponseEntity<>(
+                new HttpResponse<>(status),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
 
     @ExceptionHandler(AuthenticationException.class)
     public final ResponseEntity<HttpResponse<?>> handleAuthenticationException(AuthenticationException ex) {
@@ -140,7 +165,6 @@ public class GlobalExceptionHandler
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-
     }
 
 }
