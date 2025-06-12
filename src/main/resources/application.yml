@@ -1,16 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/azki_reservation
-    username: azki_user
-    password: password
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/azki_reservation}
+    username: ${SPRING_DATASOURCE_USERNAME:azki_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
-      auto-commit: true
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
   jpa:
     hibernate:
       ddl-auto: none
@@ -18,7 +11,7 @@ spring:
   cache:
     type: redis
   redis:
-    host: localhost
+    host: ${SPRING_REDIS_HOST:localhost}
     port: 6379
 
 flyway:
@@ -29,5 +22,5 @@ server:
 
 auth:
   jwt:
-    access-token-validity-seconds: 600
-    secret: lp+flT+lHbG5iLFZzx7b5RA8oVa2CMewtiCsKs3y1Kw=
+    access-token-validity-seconds: 3600 # 1 hour
+    secret: ${JWT_SECRET:default-secret-key-for-local-dev-only-change-it}
