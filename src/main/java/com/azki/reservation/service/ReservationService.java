@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -33,11 +34,6 @@ public class ReservationService {
     public Reservation reserve(ReservationRequestDto dto, User user) {
         var slotId = dto.requestId();
 
-        var exists = redisTemplate.opsForZSet().score(KEY, slotId.toString()) != null;
-        if (!exists) {
-            throw new HttpException("Slot not available.", HttpStatus.BAD_REQUEST);
-        }
-
         var luaResult = redisTemplate.execute(
                 reserveSlotScript,
                 List.of(KEY),
@@ -53,10 +49,12 @@ public class ReservationService {
             throw new InternalServerException("500", "Slot reservation failed in DB.");
         }
 
-        return Reservation.builder()
+        return save(Reservation.builder()
                 .user(user)
                 .slot(slotService.findById(slotId))
-                .build();
+                .reservedAt(LocalDateTime.now())
+                .status(Reservation.Status.ACTIVE)
+                .build());
     }
 
     @Transactional
@@ -82,6 +80,10 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundException("Reservation not found"));
     }
 
+    public Reservation save(Reservation reservation) {
+        return reservationRepository.save(reservation);
+    }
+
     private void rollbackRedis(Long slotId) {
         var slot = slotService.findById(slotId);
 
@@ -91,4 +93,5 @@ public class ReservationService {
                     slot.getStartTime().toEpochSecond(ZoneOffset.UTC));
         }
     }
+
 }
